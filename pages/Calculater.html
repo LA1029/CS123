@@ -1,0 +1,440 @@
+<!-- Wire EDM Time Calculator -->
+<div class="container">
+  <header>
+    <h1>Wire EDM Time Calculator</h1>
+    <p class="subtitle">Mobile-optimized calculation tool for wire cutting operations</p>
+  </header>
+
+  <div class="calculator-container">
+    <div class="card">
+      <h2>Calculation Parameters</h2>
+      <div class="input-group">
+        <label for="wireThk">Part Height (mm)</label>
+        <input type="number" id="wireThk" min="5" max="230" step="0.1" placeholder="Enter height in mm">
+      </div>
+      <div class="input-group">
+        <label for="wireLen">Cutting Length (mm)</label>
+        <input type="number" id="wireLen" min="1" step="0.1" placeholder="Enter length in mm">
+      </div>
+      <div class="input-group">
+        <label for="wireSpeed">Cutting Speed Preference</label>
+        <select id="wireSpeed">
+          <option value="fast">Fast</option>
+          <option value="center" selected>Medium (Recommended)</option>
+          <option value="slow">Slow (High Precision)</option>
+        </select>
+      </div>
+      <button onclick="calculateWirecut()">
+        <i class="fas fa-calculator"></i> Calculate Machining Time
+      </button>
+      <div class="result-box">
+        <h3>Calculation Result</h3>
+        <p id="wireResult">Please enter values and click calculate</p>
+        <div class="result-value" id="finalResult">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Reference Cutting Speeds</h2>
+      <p>Based on material height and cutting parameters</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Speed</th>
+            <th>Cutting Speed (mm/min)</th>
+            <th>Time (min)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="speed-fast">Fast</td>
+            <td id="fastRate">-</td>
+            <td id="fastTime">-</td>
+          </tr>
+          <tr>
+            <td class="speed-center">Medium</td>
+            <td id="centerRate">-</td>
+            <td id="centerTime">-</td>
+          </tr>
+          <tr>
+            <td class="speed-slow">Slow</td>
+            <td id="slowRate">-</td>
+            <td id="slowTime">-</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-text">
+        <p><strong>Note:</strong> Cutting speeds are approximate and may vary based on material type, wire diameter, machine condition, and other factors. Always verify with actual machine parameters.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Wire EDM Time Calculator | © 2023 Manufacturing Tools</p>
+  </footer>
+</div>
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Wire EDM Styles -->
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .calculator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-color);
+            font-size: 1.4rem;
+        }
+        
+        h3 {
+            color: var(--dark-color);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .input-group {
+            margin-bottom: 18px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .result-box {
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .speed-fast {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        .speed-center {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .speed-slow {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .info-text {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            padding: 15px;
+        }
+        
+        /* Mobile optimization */
+        @media (min-width: 768px) {
+            .calculator-container {
+                flex-direction: row;
+            }
+            
+            .card {
+                flex: 1;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        /* Small screen optimization */
+        @media (max-width: 360px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            input[type="number"], select, button {
+                padding: 12px;
+            }
+        }
+        
+        /* Prevent iOS zoom */
+        @media screen and (max-width: 768px) {
+            input[type="number"], select {
+                font-size: 16px;
+            }
+        }
+    </style>
+
+
+
+    <script>
+        const cuttingRateTable = [
+            { height: 5, fast: 13.00, slow: 8.00, center: 10.50 },
+            { height: 10, fast: 8.00,  slow: 7.00, center: 7.50 },
+            { height: 15, fast: 8.40,  slow: 5.83, center: 7.115 },
+            { height: 20, fast: 5.00,  slow: 4.00, center: 4.50 },
+            { height: 25, fast: 4.28,  slow: 3.40, center: 3.84 },
+            { height: 30, fast: 3.80,  slow: 3.30, center: 3.55 },
+            { height: 35, fast: 3.62,  slow: 2.72, center: 3.17 },
+            { height: 40, fast: 3.50,  slow: 2.40, center: 2.95 },
+            { height: 45, fast: 3.11,  slow: 2.17, center: 2.64 },
+            { height: 50, fast: 2.80,  slow: 2.00, center: 2.40 },
+            { height: 55, fast: 2.36,  slow: 1.78, center: 2.07 },
+            { height: 60, fast: 2.00,  slow: 1.60, center: 1.8 },
+            { height: 65, fast: 1.78,  slow: 1.43, center: 1.605},
+            { height: 70, fast: 1.60,  slow: 1.30, center: 1.45 },
+            { height: 75, fast: 1.49,  slow: 1.19, center: 1.34 },
+            { height: 80, fast: 1.40,  slow: 1.10, center: 1.25 },
+            { height: 85, fast: 1.29,  slow: 0.99, center: 1.14 },
+            { height: 90, fast: 1.20,  slow: 0.90, center: 1.05 },
+            { height: 95, fast: 1.09,  slow: 0.79, center: 0.94 },
+            { height: 100, fast: 1.00, slow: 0.70, center: 0.85 },
+            { height: 105, fast: 0.98, slow: 0.65, center: 0.815 },
+            { height: 110, fast: 0.95, slow: 0.60, center: 0.775 },
+            { height: 115, fast: 0.90, slow: 0.58, center: 0.74 },
+            { height: 120, fast: 0.81, slow: 0.57, center: 0.69 },
+            { height: 125, fast: 0.75, slow: 0.53, center: 0.64 },
+            { height: 130, fast: 0.70, slow: 0.48, center: 0.59 },
+            { height: 135, fast: 0.70, slow: 0.45, center: 0.575 },
+            { height: 140, fast: 0.70, slow: 0.41, center: 0.555},
+            { height: 145, fast: 0.70, slow: 0.40, center: 0.55 },
+            { height: 150, fast: 0.70, slow: 0.39, center: 0.545},
+            { height: 155, fast: 0.65, slow: 0.39, center: 0.52 },
+            { height: 160, fast: 0.62, slow: 0.39, center: 0.505 },
+            { height: 165, fast: 0.60, slow: 0.60, center: 0.60 },
+            { height: 170, fast: 0.58, slow: 0.58, center: 0.58 },
+            { height: 175, fast: 0.56, slow: 0.56, center: 0.56 },
+            { height: 180, fast: 0.55, slow: 0.55, center: 0.55 },
+            { height: 185, fast: 0.50, slow: 0.50, center: 0.5 },
+            { height: 190, fast: 0.44, slow: 0.44, center: 0.44 },
+            { height: 195, fast: 0.42, slow: 0.42, center: 0.42 },
+            { height: 200, fast: 0.40, slow: 0.40, center: 0.4 },
+            { height: 205, fast: 0.38, slow: 0.38, center: 0.38 },
+            { height: 210, fast: 0.36, slow: 0.36, center: 0.36 },
+            { height: 215, fast: 0.34, slow: 0.34, center: 0.34 },
+            { height: 220, fast: 0.32, slow: 0.32, center: 0.32 },
+            { height: 225, fast: 0.30, slow: 0.30, center: 0.3 },
+            { height: 230, fast: 0.27, slow: 0.27, center: 0.27 }
+        ];
+
+        function getCuttingRate(partHeight, speed) {
+            let rate = cuttingRateTable[0][speed];
+            for (let i = cuttingRateTable.length - 1; i >= 0; i--) {
+                if (partHeight >= cuttingRateTable[i].height) {
+                    rate = cuttingRateTable[i][speed];
+                    break;
+                }
+            }
+            return rate;
+        }
+
+        function calculateWirecut() {
+            let thk = parseFloat(document.getElementById("wireThk").value);
+            let len = parseFloat(document.getElementById("wireLen").value);
+
+            if (!thk || !len) {
+                document.getElementById("wireResult").innerText = "Please enter valid values for Part Height and Length.";
+                document.getElementById("finalResult").innerText = "-";
+                return;
+            }
+
+            // Update reference table
+            ["fast", "center", "slow"].forEach(speed => {
+                let rate = getCuttingRate(thk, speed);
+                document.getElementById(speed + "Rate").innerText = rate.toFixed(2);
+                let timeMin = len / rate;
+                document.getElementById(speed + "Time").innerText = timeMin.toFixed(2);
+            });
+
+            // Calculate selected speed
+            let selectedSpeed = document.getElementById("wireSpeed").value;
+            let selectedRate = getCuttingRate(thk, selectedSpeed);
+            let selectedTime = len / selectedRate;
+
+            document.getElementById("wireResult").innerText = 
+                `Cutting Speed: ${selectedRate.toFixed(2)} mm/min | Length: ${len} mm`;
+            document.getElementById("finalResult").innerText = 
+                `${selectedTime.toFixed(2)} minutes`;
+        }
+
+        // Initialize with example values
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("wireThk").value = "30";
+            document.getElementById("wireLen").value = "100";
+            calculateWirecut();
+            
+            // Add touch feedback
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.8';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
