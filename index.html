@@ -1,24 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>My Tools</title>
-  <!-- 全局样式 -->
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户资料输入</title>
+  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+      background: #f9f9f9;
+    }
+
+    /* Sidebar 样式 */
+    .sidebar {
+      width: 220px;
+      background-color: #2d3e50;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 20px;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #1abc9c;
+    }
+
+    /* 主内容区域 */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    select, input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #reader {
+      width: 100%;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* 手机模式下 sidebar 折叠 */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-around;
+      }
+      .sidebar h2 {
+        display: none;
+      }
+      .sidebar a {
+        margin: 5px;
+        padding: 10px;
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- 侧边栏 -->
+
+  <!-- 左侧导航栏 -->
   <div class="sidebar">
-    <h2>My Tools</h2>
-    <ul>
-      <li><a href="pages/WIreCut.html" target="contentFrame">Wire EDM Calculator</a></li>
-      <li><a href="pages/CSQR.html" target="contentFrame">QR & Barcode Generator</a></li>
-    </ul>
+    <h2>菜单</h2>
+    <a href="#">🏠 首页</a>
+    <a href="#">📋 客户输入</a>
+    <a href="#">📦 数据查看</a>
+    <a href="#">⚙️ 设置</a>
   </div>
 
-  <!-- 主内容区 -->
+  <!-- 主内容 -->
   <div class="main-content">
-    <iframe name="contentFrame" src="pages/wire.html"></iframe>
+    <h2>客户资料输入</h2>
+
+    <label>选择客户：</label>
+    <select id="clientSelect">
+      <option value="">请选择客户</option>
+      <option value="abc">ABC 公司</option>
+      <option value="efg">EFG 公司</option>
+    </select>
+
+    <div id="formContainer"></div>
+
+    <button id="submitBtn" style="display:none;" onclick="submitData()">提交</button>
+
+    <div id="reader"></div>
   </div>
+
+  <script>
+    const clientSelect = document.getElementById('clientSelect');
+    const formContainer = document.getElementById('formContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const reader = document.getElementById('reader');
+    let html5QrCode;
+
+    clientSelect.addEventListener('change', () => {
+      const client = clientSelect.value;
+      if (!client) return;
+      submitBtn.style.display = "block";
+
+      if (client === 'abc') {
+        formContainer.innerHTML = `
+          <label>Lot 号码：</label>
+          <input id="lot" placeholder="输入或扫描">
+          <button onclick="openCamera()">📷 打开相机扫描</button>
+        `;
+      } else if (client === 'efg') {
+        formContainer.innerHTML = `
+          <label>批号：</label>
+          <input id="batch" placeholder="请输入批号">
+        `;
+      }
+    });
+
+    async function openCamera() {
+      reader.style.display = "block";
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+
+      const config = { fps: 10, qrbox: 250 };
+      html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        qrCodeMessage => {
+          document.getElementById("lot").value = qrCodeMessage;
+          html5QrCode.stop();
+          reader.style.display = "none";
+        },
+        errorMessage => {
+          // 可忽略扫描错误
+        }
+      ).catch(err => {
+        alert("无法开启相机：" + err);
+      });
+    }
+
+    async function submitData() {
+      const data = {
+        client: clientSelect.value,
+        lot: document.getElementById('lot')?.value || '',
+        batch: document.getElementById('batch')?.value || ''
+      };
+
+      const scriptURL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+      try {
+        await fetch(scriptURL, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        });
+        alert("✅ 数据已提交成功！");
+      } catch (err) {
+        alert("❌ 提交失败: " + err);
+      }
+    }
+  </script>
 </body>
 </html>
