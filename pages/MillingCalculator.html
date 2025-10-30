@@ -152,15 +152,42 @@
           <button id="resetBtn" class="btn-secondary"><i class="fa-solid fa-rotate"></i> Reset</button>
         </div>
 
-        <div class="formula">
-          <strong>Formulas</strong>
-          <div style="margin-top:6px">Vc = (π × D × n) / 1000</div>
-          <div>n = (Vc × 1000) / (π × D)</div>
-          <div>Vf = n × fz × Z  (milling)</div>
-          <div>Vf = n × f  (drilling)</div>
-          <hr style="margin:10px 0;border:none;border-top:1px solid #e3e8ee;">
-          <div id="formulaUsed"></div>
-        </div>
+<div class="formula" style="background:#fafafa; padding:16px; border-radius:12px; border:1px solid #e3e8ee; box-shadow:0 4px 10px rgba(0,0,0,0.03);">
+  <strong style="font-size:1.05rem; color:#23303a;">Formulas & Explanations</strong>
+  
+  <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+    <div style="display:flex; flex-direction:column;">
+      <div style="font-weight:600; color:#2b2b2b;">Vc = (π × D × n) / 1000</div>
+      <div class="small" style="margin-left:12px; color:#6b7785;">Cutting Speed (Vc): speed at the tool edge (m/min)</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column;">
+      <div style="font-weight:600; color:#2b2b2b;">n = (Vc × 1000) / (π × D)</div>
+      <div class="small" style="margin-left:12px; color:#6b7785;">Spindle Speed (n): machine spindle rotation (rpm)</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column;">
+      <div style="font-weight:600; color:#2b2b2b;">Vf = n × fz × Z  (milling)</div>
+      <div class="small" style="margin-left:12px; color:#6b7785;">Feed (Vf): table/feed movement per minute (mm/min)</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column;">
+      <div style="font-weight:600; color:#2b2b2b;">Vf = n × f  (drilling)</div>
+      <div class="small" style="margin-left:12px; color:#6b7785;">Feed (Vf) for drilling: axial feed per minute</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column;">
+      <div style="font-weight:600; color:#2b2b2b;">fz = Vf / (n × Z)</div>
+      <div class="small" style="margin-left:12px; color:#6b7785;">Feed per Tooth (fz): chipload per tooth (mm/tooth)</div>
+    </div>
+  </div>
+
+  <hr style="margin:16px 0; border:none; border-top:1px solid #e3e8ee;">
+
+  <div id="formulaUsed" style="padding-top:6px; font-size:0.95rem; color:#23303a;"></div>
+</div>
+
+
       </section>
 
       <aside class="side">
