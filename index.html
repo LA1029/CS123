@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 侧边栏 -->
+
+  <!-- 🔹 移动端菜单按钮 -->
+  <div class="menu-toggle" onclick="toggleMenu()">☰ Menu</div>
+
+  <!-- 🔹 侧边栏 -->
   <div class="sidebar">
     <h2>My Tools</h2>
     <ul>
@@ -20,14 +24,15 @@
     </footer>
   </div>
 
-  <!-- 主内容 -->
+  <!-- 🔹 主内容 -->
   <div class="main-content">
     <div id="loading">Loading...</div>
     <iframe name="contentFrame" src="pages/WIreCut.html" id="mainFrame"></iframe>
   </div>
 
+  <!-- 🔹 脚本 -->
   <script>
-    // 侧边栏选中状态切换
+    // 菜单选中状态切换
     const links = document.querySelectorAll('.sidebar a');
     links.forEach(link => {
       link.addEventListener('click', () => {
@@ -45,6 +50,13 @@
     iframe.addEventListener('loadstart', () => {
       loading.style.display = 'flex';
     });
+
+    // 🔹 移动端菜单开关
+    function toggleMenu() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('show');
+    }
   </script>
+
 </body>
 </html>
