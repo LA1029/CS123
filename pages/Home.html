@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | CS Tools</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* ==== 首页样式 ==== */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+      color: #0a2a59;
+    }
+
+    .home-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 40px;
+      box-sizing: border-box;
+    }
+
+    /* ===== 标题部分 ===== */
+    .home-header {
+      text-align: center;
+      margin-bottom: 70px;
+    }
+
+    .home-header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #0a2a59;
+      margin-bottom: 10px;
+    }
+
+    .home-header p {
+      color: #4b5563;
+      font-size: 15px;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ===== 工具卡片布局 ===== */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 32px;
+    }
+
+    .tool-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 28px 24px;
+      box-shadow: 0 2px 6px rgba(10, 42, 89, 0.06);
+      transition: all 0.25s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 14px rgba(10, 42, 89, 0.12);
+    }
+
+    .tool-card h3 {
+      color: #0a2a59;
+      font-size: 18px;
+      margin: 10px 0 8px;
+    }
+
+    .tool-card p {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 42px;
+      margin-bottom: 18px;
+    }
+
+    /* 按钮样式 */
+    .launch-btn {
+      display: inline-block;
+      text-decoration: none;
+      background: #0a2a59;
+      color: #fff;
+      border-radius: 6px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.25s ease;
+    }
+
+    .launch-btn:hover {
+      background: #004aad;
+      transform: translateY(-1px);
+    }
+
+    /* 页脚 */
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+      margin-top: 80px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e9f2;
+    }
+
+    /* 手机端优化 */
+    @media (max-width: 768px) {
+      .home-container {
+        padding: 50px 20px;
+      }
+
+      .home-header h1 {
+        font-size: 26px;
+      }
+
+      .home-header p {
+        font-size: 13px;
+      }
+
+      .tool-card {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="home-container">
+    <div class="home-header">
+      <h1>Welcome to CS Tools</h1>
+      <p>
+        Your precision manufacturing companion — designed for machinists, engineers, and technicians who value speed, accuracy, and clarity.
+      </p>
+    </div>
+
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h3>Wire EDM Calculator</h3>
+        <p>Compute discharge speed, cutting time, and efficiency parameters for EDM operations.</p>
+        <a href="WIreCut.html" class="launch-btn">Launch</a>
+      </div>
+
+      <div class="tool-card">
+        <h3>Milling Calculator</h3>
+        <p>Calculate spindle speed, feed rate, and cutting performance for milling processes.</p>
+        <a href="MillingCalculator.html" class="launch-btn">Launch</a>
+      </div>
+
+      <div class="tool-card">
+        <h3>Turning Calculator</h3>
+        <p>Quickly find tool RPM, feed per rev, and geometric angles for lathe operations.</p>
+        <a href="Turning/Diagonal.html" class="launch-btn">Launch</a>
+      </div>
+
+      <div class="tool-card">
+        <h3>QR & Barcode Generator</h3>
+        <p>Instantly create custom QR codes and barcodes for production labels.</p>
+        <a href="CSQR.html" class="launch-btn">Launch</a>
+      </div>
+    </div>
+
+    <footer>
+      © 2025 Circle Spin Precision Engineering
+    </footer>
+  </div>
+</body>
+</html>
