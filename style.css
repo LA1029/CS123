@@ -195,3 +195,54 @@ iframe {
     transform: translateY(0);
   }
 }
+
+/* ===== 🔹 子菜单（submenu）样式 ===== */
+.submenu > a {
+  cursor: pointer;
+  display: block;
+  padding: 12px 25px;
+  color: #cfcfcf;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  font-size: 15px;
+}
+
+.submenu > a:hover {
+  background-color: #0078d7;
+  color: #fff;
+  padding-left: 30px;
+}
+
+.submenu-items {
+  display: none;
+  list-style: none;
+  padding-left: 15px;
+  margin: 0;
+  background-color: #25253a; /* 子项背景稍微深一点区分层级 */
+}
+
+.submenu-items li a {
+  display: block;
+  padding: 10px 35px;
+  color: #bfbfbf;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.submenu-items li a:hover {
+  background-color: #0078d7;
+  color: #fff;
+  padding-left: 40px;
+}
+
+/* 展开的状态 */
+.submenu.open > .submenu-items {
+  display: block;
+}
+
+.submenu.open > a {
+  background-color: #2e2e40;
+  color: #fff;
+}
+
