@@ -13,13 +13,21 @@
 
   <!-- 🔹 侧边栏 -->
   <div class="sidebar">
-    <h2>CS Tools</h2>
+    <div class="sidebar-header">
+      <img src="pages/CS.png" alt="Circle Spin Logo" class="sidebar-logo" />
+      <h2>CS Tools</h2>
+    </div>
+
     <ul>
-      <li><a href="pages/WIreCut.html" target="contentFrame" class="active">Wire EDM Calculator</a></li>
+      <!-- Home -->
+      <li><a href="pages/Home.html" target="contentFrame" id="menuHome" class="active">Home</a></li>
+
+      <!-- Tools -->
+      <li><a href="pages/WIreCut.html" target="contentFrame">Wire EDM Calculator</a></li>
       <li><a href="pages/CSQR.html" target="contentFrame">QR & Barcode Generator</a></li>
       <li><a href="pages/MillingCalculator.html" target="contentFrame">Milling Calculator</a></li>
 
-      <!-- 🔹 Turning Calculator 主菜单 -->
+      <!-- Turning submenu -->
       <li class="submenu">
         <a href="#" onclick="toggleSubmenu(event)">Turning Calculator ▸</a>
         <ul class="submenu-items">
@@ -35,88 +43,72 @@
     </footer>
   </div>
 
-  <!-- 🔹 主内容 -->
+  <!-- 🔹 主内容 iframe -->
   <div class="main-content">
     <div id="loading">Loading...</div>
-    <iframe name="contentFrame" src="pages/WIreCut.html" id="mainFrame"></iframe>
+    <iframe name="contentFrame" id="mainFrame"></iframe>
   </div>
 
   <!-- 🔹 脚本 -->
   <script>
-    // 菜单选中状态切换
-    const links = document.querySelectorAll('.sidebar a[target="contentFrame"]');
-    links.forEach(link => {
-      link.addEventListener('click', () => {
-        links.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
+    const iframe = document.getElementById("mainFrame");
+    const loading = document.getElementById("loading");
+    const menuLinks = document.querySelectorAll(".sidebar a[target='contentFrame']");
+
+    // 页面加载默认打开 Home
+    window.addEventListener("load", () => {
+      const lastPage = localStorage.getItem("lastPage") || "pages/Home.html";
+      iframe.src = lastPage;
+      highlightMenu(lastPage);
+    });
+
+    // 菜单点击事件
+    menuLinks.forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const href = link.getAttribute("href");
+        iframe.src = href;
+        localStorage.setItem("lastPage", href);
+        highlightMenu(href);
+        document.querySelector(".sidebar").classList.remove("show");
       });
     });
 
-    // iframe 加载动画
-    const iframe = document.getElementById('mainFrame');
-    const loading = document.getElementById('loading');
-    iframe.addEventListener('load', () => {
-      loading.style.display = 'none';
-    });
-    iframe.addEventListener('loadstart', () => {
-      loading.style.display = 'flex';
+    // iframe 加载完毕隐藏 Loading
+    iframe.addEventListener("load", () => {
+      loading.style.display = "none";
     });
 
-    // 🔹 移动端菜单开关
-    function toggleMenu() {
-      const sidebar = document.querySelector('.sidebar');
-      sidebar.classList.toggle('show');
+    // 菜单高亮函数
+    function highlightMenu(currentHref) {
+      menuLinks.forEach(l => {
+        const isActive = l.getAttribute("href") === currentHref;
+        l.classList.toggle("active", isActive);
+      });
     }
 
-    // 🔹 展开/收起子菜单
+    // 移动端菜单
+    function toggleMenu() {
+      document.querySelector(".sidebar").classList.toggle("show");
+    }
+
+    // Turning submenu
     function toggleSubmenu(event) {
       event.preventDefault();
-      const parent = event.target.closest('.submenu');
-      parent.classList.toggle('open');
-
-      // 改变箭头方向
-      const arrow = parent.querySelector('a');
-      if (parent.classList.contains('open')) {
-        arrow.innerHTML = "Turning Calculator ▾";
-      } else {
-        arrow.innerHTML = "Turning Calculator ▸";
-      }
+      const parent = event.target.closest(".submenu");
+      parent.classList.toggle("open");
+      const arrow = parent.querySelector("a");
+      arrow.innerHTML = parent.classList.contains("open")
+        ? "Turning Calculator ▾"
+        : "Turning Calculator ▸";
     }
-    
-          // ✅ 点击菜单项后自动关闭菜单（适用于手机）
-      document.querySelectorAll('.sidebar a[target="contentFrame"]').forEach(link => {
-        link.addEventListener('click', () => {
-          const sidebar = document.querySelector('.sidebar');
-          sidebar.classList.remove('show'); // 自动关闭菜单
 
-          // ✅ 保存当前 iframe 页面的地址到 localStorage
-          localStorage.setItem('lastPage', link.getAttribute('href'));
-        });
-      });
-
-      // ✅ 监听页面加载时，恢复上次浏览的页面
-      window.addEventListener('load', () => {
-        const lastPage = localStorage.getItem('lastPage');
-        const iframe = document.getElementById('mainFrame');
-
-        if (lastPage) {
-          iframe.src = lastPage;
-
-          // 让对应菜单项高亮
-          document.querySelectorAll('.sidebar a[target="contentFrame"]').forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === lastPage);
-          });
-        }
-      });
-
-      // ✅ 当点击“Turning Calculator”子菜单里的项目时，也会自动关闭菜单
-      document.querySelectorAll('.submenu-items a').forEach(link => {
-        link.addEventListener('click', () => {
-          const sidebar = document.querySelector('.sidebar');
-          sidebar.classList.remove('show');
-        });
-      });
-
+    // 让子页面也能切换工具（从 Home 的 Launch 按钮）
+    window.showIframeWith = function (src) {
+      iframe.src = src;
+      localStorage.setItem("lastPage", src);
+      highlightMenu(src);
+    };
   </script>
 </body>
 </html>
