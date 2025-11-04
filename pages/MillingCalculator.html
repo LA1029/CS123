@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Milling Calculator v4.5 — Gray Industrial Edition</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+:root{
+  --primary: #1a3a5f;
+  --primary-dark: #0f2a46;
+  --primary-light: #2b6fb3;
+  --secondary: #2e8b57;
+  --accent: #ff8a00;
+  --bg: linear-gradient(135deg, #f3f7fc 0%, #e8f0f8 100%);
+  --panel: #ffffff;
+  --text: #22313a;
+  --text-light: #4a6572;
+  --muted: #6b7785;
+  --border: #e6edf2;
+  --shadow: 0 8px 30px rgba(14, 40, 50, 0.08);
+  --shadow-light: 0 4px 12px rgba(14, 40, 50, 0.04);
+  --radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{
+  height: 100%;
+  margin:0;
+  padding:0;
+  overflow: auto;
+}
+body{
+  font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* app container */
+.app{
+  width: 100%;
+  max-width: 1200px;
+  border-radius: var(--radius);
+  padding: 24px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: visible;
+  margin-bottom: 20px;
+}
+
+/* subtle background pattern */
+.app::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(43, 111, 179, 0.05) 0%, rgba(43, 111, 179, 0) 70%);
+  z-index: 0;
+}
+
+/* Grid layout: inputs left-top, results left-bottom, reference right-top, formulas right-bottom */
+  .layout{
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    grid-template-rows: auto 1fr; 
+    grid-template-areas:
+      "inputs reference"
+      "results formulas";
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+@media (max-width: 980px){
+  .layout{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "inputs"
+      "reference"
+      "formulas"
+      "results";
+  }
+}
+
+/* inputs panel (left-top) */
+.panel{ 
+  grid-area: inputs; 
+  background: var(--panel); 
+  border-radius: var(--radius); 
+  padding: 20px; 
+  border: 1px solid var(--border); 
+  box-shadow: var(--shadow-light);
+  transition: var(--transition);
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel:hover {
+  box-shadow: var(--shadow);
+}
+
+header{
+  display: flex; 
+  gap: 14px; 
+  align-items: center; 
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo{
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  overflow: hidden; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(43, 111, 179, 0.2);
+}
+
+.logo img{
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+
+}
+
+.title h1{
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--primary);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.title p{
+  margin: 6px 0 0;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.modes{
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.mode-btn{
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #dfeaf6;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  min-width: 120px;
+}
+
+.mode-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(43, 111, 179, 0.1);
+  border-color: var(--primary-light);
+}
+
+.mode-btn.active{
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: white;
+  box-shadow: 0 6px 15px rgba(43, 111, 179, 0.2);
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+}
+
+.grid-2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media(max-width:600px){
+  .grid-2{
+    grid-template-columns: 1fr;
+  }
+}
+
+label{
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-light);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+input, select{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: 1rem;
+  transition: var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(43, 111, 179, 0.1);
+}
+
+.input-group {
+  margin-bottom: 12px;
+}
+
+.suggestion {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: rgba(43, 111, 179, 0.05);
+  border-radius: 6px;
+}
+
+.controls{
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary{
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
+  box-shadow: 0 4px 8px rgba(26, 58, 95, 0.2);
+  min-width: 140px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(26, 58, 95, 0.3);
+}
+
+.btn-secondary{
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--primary-light);
+  background: var(--panel);
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 100px;
+}
+
+.btn-secondary:hover{
+  background: var(--primary-light);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(43, 111, 179, 0.2);
+}
+
+.note{
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-top: 16px;
+  line-height: 1.4;
+  padding: 12px;
+  background: rgba(43, 111, 179, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-light);
+}
+
+/* results panel (left-bottom) */
+.results-panel{ 
+  grid-area: results; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 16px; 
+  min-height: 300px;
+}
+
+.card{ 
+  background: var(--panel); 
+  padding: 20px; 
+  border-radius: var(--radius); 
+  border: 1px solid var(--border); 
+  box-shadow: var(--shadow-light);
+  transition: var(--transition);
+  height: 100%;
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
+}
+
+.kpi{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.meta{
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.meta .ic{
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f4f9ff, #fbfdff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1.2rem;
+  box-shadow: 0 4px 8px rgba(43, 111, 179, 0.1);
+}
+
+.result-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.box-blue{
+  background: linear-gradient(135deg, rgba(43, 111, 179, 0.08), rgba(43, 111, 179, 0.03));
+  padding: 16px;
+  border-radius: 10px;
+  border-left: 4px solid var(--primary-light);
+}
+
+.box-green{
+  background: linear-gradient(135deg, rgba(46, 139, 87, 0.08), rgba(46, 139, 87, 0.03));
+  padding: 16px;
+  border-radius: 10px;
+  border-left: 4px solid var(--secondary);
+}
+
+.box-orange{
+  background: linear-gradient(135deg, rgba(255, 138, 0, 0.08), rgba(255, 138, 0, 0.03));
+  padding: 16px;
+  border-radius: 10px;
+  border-left: 4px solid var(--accent);
+}
+
+.big{
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.muted{
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.ok{
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+.warn{
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.small{
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* 参考表格容器样式 - 已修改 */
+.ref-container{ 
+  grid-area: reference; 
+  display: flex; 
+  flex-direction: column; 
+  height: 100%;
+}
+
+.ref-table{
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid #eef6fa;
+  background: linear-gradient(135deg, #ffffff, #fbfcfd);
+  box-shadow: var(--shadow-light);
+  transition: var(--transition);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ref-table:hover {
+  box-shadow: var(--shadow);
+}
+
+.ref-head{
+  background: linear-gradient(135deg, #f6f8fa, #f1f5f9);
+  padding: 16px 20px;
+  border-bottom: 1px solid #eef6fa;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  flex-shrink: 0; /* 防止头部被压缩 */
+}
+
+.ref-head .title{
+  font-weight: 800;
+  color: var(--primary); 
+  font-size: 1rem;
+}
+
+.ref-body{
+  padding: 0; /* 移除内边距，让表格充满容器 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1; /* 占据所有剩余空间 */
+  min-height: 0; /* 允许flex子项缩小 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 表格样式调整 */
+table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  table-layout: fixed;
+  flex: 1; /* 表格占据所有可用空间 */
+  display: flex;
+  flex-direction: column;
+}
+
+thead {
+  flex-shrink: 0; /* 表头不收缩 */
+}
+
+tbody {
+  flex: 1; /* 表体占据剩余空间 */
+  overflow-y: auto;
+  display: block;
+}
+
+thead tr, tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* 设置列宽 */
+th:nth-child(1), td:nth-child(1) { width: 35%; } /* 材料列 */
+th:nth-child(2), td:nth-child(2) { width: 30%; } /* 刀具列 */
+th:nth-child(3), td:nth-child(3) { width: 35%; } /* 速度列 */
+
+th,td{
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #f1f6f9;
+  color: var(--text);
+}
+
+th{
+  font-weight: 700;
+  background: rgba(43, 111, 179, 0.05);
+  color: var(--primary);
+  position: sticky;
+  top: 0; /* 表头固定 */
+  z-index: 10;
+}
+
+tr:last-child td{
+  border-bottom: 0;
+}
+
+tr:hover td {
+  background: rgba(43, 111, 179, 0.03);
+}
+
+/* right formulas (bottom-right) */
+.formula-card{ 
+  grid-area: formulas; 
+  background: linear-gradient(135deg, #fbfcfd, #f8fbff);
+  border: 1px solid #eef3f6; 
+  border-radius: var(--radius); 
+  padding: 16px;
+  box-shadow: var(--shadow-light);
+  transition: var(--transition);
+  height: auto; 
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.formula-card:hover {
+  box-shadow: var(--shadow);
+}
+
+.formula-card h3{
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 800;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.formula-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.formula-line{
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.formula-line:hover {
+  background: white;
+  transform: translateX(4px);
+}
+
+.formula-line .title{
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+}
+
+.formula-line .desc{
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+/* TAP specific styles */
+.tap-input-group {
+  display: none;
+}
+
+.tap-input-group.active {
+  display: block;
+}
+
+/* small screen: collapsible ref */
+.ref-toggle { 
+  display: none; 
+  cursor: pointer; 
+  font-weight: 700; 
+  color: var(--primary-light); 
+  background: transparent; 
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.ref-toggle:hover {
+  background: rgba(43, 111, 179, 0.1);
+}
+
+@media (max-width: 980px){
+.layout{
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto auto; /* 调整行定义 */
+  grid-template-areas:
+    "inputs"
+    "reference"  /* 参考表格在移动端也占据完整区域 */
+    "formulas"
+    "results";
+}
+
+.ref-container {
+  height: 400px; /* 移动端给固定高度 */
+}
+
+@media (max-width: 600px){
+.ref-container {
+  height: 350px; /* 小屏幕调整高度 */
+}
+}
+.ref-head {
+flex-shrink: 0; /* 防止头部被压缩 */
+}
+
+.ref-body {
+flex: 1;
+min-height: 0;
+overflow-y: auto;
+}
+  .ref-toggle { 
+    display: inline-block; 
+  }
+ .ref-body{ 
+    max-height: 400px; /* 在中等屏幕上调整高度 */
+  } 
+  .formula-card {
+    margin-top: 0;
+  }
+  .ref-container {
+    gap: 16px;
+  }
+  .panel, .ref-container {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 600px){
+  .ref-body{ 
+    max-height: 220px;
+  }
+  .app{ 
+    padding: 16px;
+  }
+  .formula-card{ 
+    padding: 16px;
+  }
+  .mode-btn {
+    min-width: 100px;
+  }
+  .btn-primary, .btn-secondary {
+    min-width: 120px;
+    flex: 1;
+  }
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+    th:nth-child(1), td:nth-child(1) { width: 40%; }
+th:nth-child(2), td:nth-child(2) { width: 25%; }
+th:nth-child(3), td:nth-child(3) { width: 35%; }
+}
+
+/* Footer */
+.footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* 更新参考表格样式使其可滚动 */
+.ref-body{
+padding: 12px; 
+overflow: auto;
+flex: 1;
+max-height: 400px; /* 添加最大高度 */
+}
+
+/* 确保表格头部在滚动时保持可见 */
+.ref-table {
+display: flex;
+flex-direction: column;
+height: 100%;
+}
+
+/* 响应式调整 */
+@media (max-width: 980px){
+.ref-body{ 
+  max-height: 300px;
+}
+}
+
+@media (max-width: 600px){
+.ref-body{ 
+  max-height: 250px;
+}
+}
+</style>
+</head>
+<body>
+  <div class="app" aria-label="Milling Calculator v4.5">
+    <header>
+      <div class="logo"><img src="CS.png" alt="Company Logo"></div>
+      <div class="title">
+        <h1>Milling Calculator v4.5</h1>
+        <p>Endmill · Drill · Slotmill · Tap — Material-Based Speed & Feed Guidance</p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT TOP: Inputs -->
+      <section class="panel" aria-labelledby="inputs">
+        <div>
+          <strong id="inputs" style="font-size: 1.1rem; color: var(--primary);">Input Parameters</strong>
+          <div class="small" style="margin-top:8px">Choose tool type & material — use Suggest to auto-fill conservative starting values.</div>
+        </div>
+
+        <div class="modes" style="margin-top:16px">
+          <button class="mode-btn active" data-mode="endmill"><i class="fa-solid fa-cut"></i> Endmill</button>
+          <button class="mode-btn" data-mode="drill"><i class="fa-solid fa-drill"></i> Drill</button>
+          <button class="mode-btn" data-mode="slot"><i class="fa-solid fa-slash"></i> Slotmill</button>
+          <button class="mode-btn" data-mode="tap"><i class="fa-solid fa-screwdriver"></i> Tap</button>
+        </div>
+
+        <!-- Standard milling inputs (shown by default) -->
+        <div id="standardInputs">
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="toolMat">Tool Material</label>
+              <select id="toolMat">
+                <option value="carbide">Carbide</option>
+                <option value="hss">HSS</option>
+                <option value="coated">Coated Carbide</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="workMat">Work Material</label>
+              <select id="workMat">
+                <option value="mild_steel">Mild Steel</option>
+                <option value="stainless">Stainless Steel</option>
+                <option value="cast_iron">Cast Iron (Grey)</option>
+                <option value="aluminium">Aluminium</option>
+                <option value="brass">Brass</option>
+                <option value="copper">Copper</option>
+                <option value="titanium_alloy">Titanium Alloy</option>
+                <option value="inconel">Inconel</option>
+                <option value="tool_steel">Tool Steel</option>
+                <option value="plastic_hard">Plastic (Hard)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="Vc">Cutting Speed Vc (m/min)</label>
+              <input id="Vc" placeholder="Auto-suggested — editable">
+              <div id="vcRange" class="suggestion">Suggestion will appear after selection</div>
+            </div>
+            <div class="input-group">
+              <label for="D">Tool Diameter D (mm)</label>
+              <input id="D" placeholder="e.g. 20">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="n">Spindle Speed n (rpm)</label>
+              <input id="n" placeholder="Leave empty to auto-calc">
+            </div>
+            <div class="input-group">
+              <label for="Vf">Feed Vf (mm/min)</label>
+              <input id="Vf" placeholder="Table feed">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="input-group">
+              <label id="fzLabel" for="fz">Feed per Tooth fz (mm/tooth)</label>
+              <input id="fz" placeholder="mm/tooth (drill: mm/rev)">
+              <div id="fzRange" class="suggestion"></div>
+            </div>
+            <div class="input-group" id="zWrap">
+              <label for="Z">Number of Flutes (Z)</label>
+              <input id="Z" placeholder="e.g. 4">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAP specific inputs (hidden by default) -->
+        <div id="tapInputs" class="tap-input-group">
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="threadType">Thread Type</label>
+              <select id="threadType">
+                <option value="metric">Metric (M)</option>
+                <option value="unc">UNC</option>
+                <option value="unf">UNF</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="threadSize">Thread Size</label>
+              <input id="threadSize" placeholder="e.g. M6x1.0 or 5/16-18">
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <div class="input-group">
+              <label for="tapRpm">Spindle Speed (rpm)</label>
+              <input id="tapRpm" placeholder="e.g. 60">
+            </div>
+            <div class="input-group">
+              <label for="tapMaterial">Work Material</label>
+              <select id="tapMaterial">
+                <option value="mild_steel">Mild Steel</option>
+                <option value="stainless">Stainless Steel</option>
+                <option value="cast_iron">Cast Iron</option>
+                <option value="aluminium">Aluminium</option>
+                <option value="brass">Brass</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="note">
+            For UNC threads: Drill size = (Major Diameter - 1/Threads per Inch) × 25.4<br>
+            For Metric threads: Drill size = Major Diameter - Pitch
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="calcBtn" class="btn-primary"><i class="fa-solid fa-calculator"></i> Calculate</button>
+          <button id="suggestBtn" class="btn-secondary"><i class="fa-solid fa-lightbulb"></i> Suggest</button>
+          <button id="resetBtn" class="btn-secondary"><i class="fa-solid fa-rotate"></i> Reset</button>
+        </div>
+
+        <div class="note">Tip: fill Vc or n — leave one blank to auto-calc. Use Suggest for conservative starts.</div>
+      </section>
+
+      <!-- RIGHT TOP: Reference (scrollable) -->
+      <div class="ref-container">
+        <div class="ref-table" id="refTable">
+          <div class="ref-head">
+            <div class="title">Cutting Speed Reference Table</div>
+            <div>
+              <span id="refSummary" class="small muted">30 entries</span>
+              <button id="refToggleBtn" class="ref-toggle" aria-expanded="false">Show reference</button>
+            </div>
+          </div>
+
+          <div class="ref-body" id="refBody">
+            <table aria-describedby="Cutting Speed Reference">
+              <thead>
+                <tr><th>Work Material</th><th>Tool</th><th>Typical Vc (m/min)</th></tr>
+              </thead>
+              <tbody id="refTbody">
+                <tr><td>Mild Steel</td><td>HSS</td><td>25–35</td></tr>
+                <tr><td>Mild Steel</td><td>Carbide</td><td>80–120</td></tr>
+                <tr><td>Mild Steel</td><td>Coated Carbide</td><td>85–130</td></tr>
+                <tr><td>Stainless Steel</td><td>HSS</td><td>20–30</td></tr>
+                <tr><td>Stainless Steel</td><td>Carbide</td><td>60–100</td></tr>
+                <tr><td>Stainless Steel</td><td>Coated Carbide</td><td>65–110</td></tr>
+                <tr><td>Cast Iron (Grey)</td><td>HSS</td><td>15–25</td></tr>
+                <tr><td>Cast Iron (Grey)</td><td>Carbide</td><td>70–120</td></tr>
+                <tr><td>Cast Iron (Grey)</td><td>Coated Carbide</td><td>75–130</td></tr>
+                <tr><td>Aluminium</td><td>HSS</td><td>100–150</td></tr>
+                <tr><td>Aluminium</td><td>Carbide</td><td>250–500</td></tr>
+                <tr><td>Aluminium</td><td>Coated Carbide</td><td>270–540</td></tr>
+                <tr><td>Brass</td><td>HSS</td><td>90–150</td></tr>
+                <tr><td>Brass</td><td>Carbide</td><td>300–600</td></tr>
+                <tr><td>Brass</td><td>Coated Carbide</td><td>320–650</td></tr>
+                <tr><td>Copper</td><td>HSS</td><td>60–100</td></tr>
+                <tr><td>Copper</td><td>Carbide</td><td>150–300</td></tr>
+                <tr><td>Copper</td><td>Coated Carbide</td><td>160–320</td></tr>
+                <tr><td>Titanium Alloy</td><td>HSS</td><td>10–20</td></tr>
+                <tr><td>Titanium Alloy</td><td>Carbide</td><td>30–60</td></tr>
+                <tr><td>Titanium Alloy</td><td>Coated Carbide</td><td>32–65</td></tr>
+                <tr><td>Inconel</td><td>HSS</td><td>8–15</td></tr>
+                <tr><td>Inconel</td><td>Carbide</td><td>20–50</td></tr>
+                <tr><td>Inconel</td><td>Coated Carbide</td><td>22–54</td></tr>
+                <tr><td>Tool Steel</td><td>HSS</td><td>20–30</td></tr>
+                <tr><td>Tool Steel</td><td>Carbide</td><td>50–80</td></tr>
+                <tr><td>Tool Steel</td><td>Coated Carbide</td><td>54–86</td></tr>
+                <tr><td>Plastic (Hard)</td><td>HSS</td><td>150–250</td></tr>
+                <tr><td>Plastic (Hard)</td><td>Carbide</td><td>300–800</td></tr>
+                <tr><td>Plastic (Hard)</td><td>Coated Carbide</td><td>320–850</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEFT BOTTOM: Results -->
+      <div class="results-panel">
+        <div class="card">
+          <div class="kpi">
+            <div class="meta">
+              <div class="ic" id="modeIcon"><i class="fa-solid fa-cut"></i></div>
+              <div class="txt">
+                <div class="label" id="modeTitle" style="font-weight: 800; color: var(--primary);">Endmill</div>
+                <div class="sub" id="modeSub" style="color: var(--text-light);">fz × Z used for feed</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-grid" id="standardResults">
+            <div class="box-blue">
+              <div class="muted">Spindle Speed (n)</div>
+              <div class="big" id="outN">- rpm</div>
+            </div>
+
+            <div class="box-green">
+              <div class="muted">Feed (Vf)</div>
+              <div class="big" id="outVf">- mm/min</div>
+            </div>
+          </div>
+          
+          <div class="result-grid" id="tapResults" style="display: none;">
+            <div class="box-blue">
+              <div class="muted">Feed (Vf)</div>
+              <div class="big" id="outTapVf">- mm/min</div>
+            </div>
+
+            <div class="box-orange">
+              <div class="muted">Drill Size</div>
+              <div class="big" id="outDrillSize">- mm</div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+            <div id="calcMsg" class="muted">Awaiting input...</div>
+            <div style="display:flex;gap:8px">
+              <button id="copyRes" class="btn-secondary"><i class="fa-regular fa-clipboard"></i> Copy</button>
+              <button id="exportCsv" class="btn-secondary"><i class="fa-solid fa-file-csv"></i> Export</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT BOTTOM: Formula & Info -->
+      <aside class="formula-card" aria-labelledby="formula">
+        <h3 id="formula">Formulas & Explanations</h3>
+        
+        <div class="formula-content">
+          <div id="formulaUsedStatic" class="formula-line">
+            <div class="title">Vc = (π × D × n) / 1000</div>
+            <div class="desc">Cutting Speed (Vc): speed at the tool edge (m/min)</div>
+          </div>
+
+          <div class="formula-line">
+            <div class="title">n = (Vc × 1000) / (π × D)</div>
+            <div class="desc">Spindle Speed (n): machine spindle rotation (rpm)</div>
+          </div>
+
+          <div class="formula-line">
+            <div class="title">Vf = n × fz × Z (milling)</div>
+            <div class="desc">Feed (Vf): table/feed movement per minute (mm/min)</div>
+          </div>
+
+          <div class="formula-line" style="margin-bottom:6px">
+            <div class="title">Vf = n × f (drilling)</div>
+            <div class="desc">Feed (Vf) for drilling: axial feed per minute</div>
+          </div>
+          
+          <div class="formula-line" id="tapFormula" style="display: none;">
+            <div class="title">Vf = n × pitch (tapping)</div>
+            <div class="desc">Feed (Vf) for tapping: axial feed per minute</div>
+          </div>
+
+          <!-- dynamic formulas (calculation-derived) will be appended here -->
+          <div id="formulaUsed" style="margin-top:8px;color:#344146;font-size:0.95rem"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer">
+      <p>Milling Calculator v4.5 — Gray Industrial Edition &copy; 2023</p>
+    </div>
+  </div>
+
+  <script>
+    /*******************************
+     Milling Calculator v4.5 — 优化版 (包含TAP模式)
+    *******************************/
+
+    const PI = 3.14159;
+    const MAX_RPM = 10000; // 根据用户需求设置最大转速
+
+    // 优化的材料预设数据
+    const presets = {
+      mild_steel: {
+        hss: { vc:[25,35], fz:[0.02,0.06], tips: "Mild Steel (HSS) — 使用切削液，避免过热。" },
+        carbide: { vc:[80,120], fz:[0.02,0.06], tips: "Mild Steel (Carbide) — 通用加工参数。" },
+        coated: { vc:[85,130], fz:[0.02,0.06], tips: "Mild Steel (Coated) — 涂层刀具可提高切削速度。" }
+      },
+      stainless: {
+        hss: { vc:[20,30], fz:[0.02,0.05], tips: "Stainless (HSS) — 降低转速，使用切削液。" },
+        carbide: { vc:[60,100], fz:[0.02,0.05], tips: "Stainless (Carbide) — 使用切削液，降低切深。" },
+        coated: { vc:[65,110], fz:[0.02,0.05], tips: "Stainless (Coated) — 涂层刀具提高刀具寿命。" }
+      },
+      cast_iron: {
+        hss: { vc:[15,25], fz:[0.02,0.06], tips: "Cast Iron (Grey) — 脆性材料，中等速度。" },
+        carbide: { vc:[70,120], fz:[0.02,0.06], tips: "Cast Iron (Carbide) — 适合断续切削。" },
+        coated: { vc:[75,130], fz:[0.02,0.06], tips: "Cast Iron (Coated) — 涂层提高耐磨性。" }
+      },
+      aluminium: {
+        hss: { vc:[100,150], fz:[0.04,0.12], tips: "Aluminium (HSS) — 保持排屑顺畅，较高速度。" },
+        carbide: { vc:[250,500], fz:[0.04,0.12], tips: "Aluminium (Carbide) — 高转速，确保排屑。" },
+        coated: { vc:[270,540], fz:[0.04,0.12], tips: "Aluminium (Coated) — 防止积屑瘤形成。" }
+      },
+      brass: {
+        hss: { vc:[90,150], fz:[0.03,0.08], tips: "Brass (HSS) — 注意防止材料粘刀。" },
+        carbide: { vc:[300,600], fz:[0.03,0.08], tips: "Brass (Carbide) — 可实现高切削速度。" },
+        coated: { vc:[320,650], fz:[0.03,0.08], tips: "Brass (Coated) — 提高表面质量。" }
+      },
+      copper: {
+        hss: { vc:[60,100], fz:[0.03,0.08], tips: "Copper (HSS) — 保持排屑顺畅。" },
+        carbide: { vc:[150,300], fz:[0.03,0.08], tips: "Copper (Carbide) — 较高速度和排屑控制。" },
+        coated: { vc:[160,320], fz:[0.03,0.08], tips: "Copper (Coated) — 减少材料粘附。" }
+      },
+      titanium_alloy: {
+        hss: { vc:[10,20], fz:[0.01,0.03], tips: "Titanium (HSS) — 非常低的速度；避免积屑瘤。" },
+        carbide: { vc:[30,60], fz:[0.01,0.03], tips: "Titanium (Carbide) — 低转速，刚性设置。" },
+        coated: { vc:[32,65], fz:[0.01,0.03], tips: "Titanium (Coated) — 专用涂层提高性能。" }
+      },
+      inconel: {
+        hss: { vc:[8,15], fz:[0.01,0.03], tips: "Inconel (HSS) — 极低速度，短切深。" },
+        carbide: { vc:[20,50], fz:[0.01,0.03], tips: "Inconel (Carbide) — 非常低的速度；使用切削液和短行程。" },
+        coated: { vc:[22,54], fz:[0.01,0.03], tips: "Inconel (Coated) — 专用高温合金涂层。" }
+      },
+      tool_steel: {
+        hss: { vc:[20,30], fz:[0.015,0.05], tips: "Tool Steel (HSS) — 低速度；预硬化钢需要小心。" },
+        carbide: { vc:[50,80], fz:[0.015,0.05], tips: "Tool Steel (Carbide) — 使用刚性设置。" },
+        coated: { vc:[54,86], fz:[0.015,0.05], tips: "Tool Steel (Coated) — 提高刀具寿命。" }
+      },
+      plastic_hard: {
+        hss: { vc:[150,250], fz:[0.05,0.15], tips: "Plastic (Hard) (HSS) — 避免热量积聚。" },
+        carbide: { vc:[300,800], fz:[0.05,0.15], tips: "Plastic (Hard) (Carbide) — 通常可以使用非常高的速度。" },
+        coated: { vc:[320,850], fz:[0.05,0.15], tips: "Plastic (Hard) (Coated) — 提高表面质量。" }
+      }
+    };
+
+    // TAP模式预设数据
+    const tapPresets = {
+      mild_steel: { vc: [10, 20] },
+      stainless: { vc: [5, 10] },
+      cast_iron: { vc: [8, 15] },
+      aluminium: { vc: [20, 40] },
+      brass: { vc: [25, 50] }
+    };
+
+    // 元素引用
+    const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
+    const toolMatEl = document.getElementById('toolMat');
+    const workMatEl = document.getElementById('workMat');
+    const VcEl = document.getElementById('Vc');
+    const vcRangeEl = document.getElementById('vcRange');
+    const DEl = document.getElementById('D');
+    const nEl = document.getElementById('n');
+    const VfEl = document.getElementById('Vf');
+    const fzEl = document.getElementById('fz');
+    const fzLabel = document.getElementById('fzLabel');
+    const fzRangeEl = document.getElementById('fzRange');
+    const ZEl = document.getElementById('Z');
+    const calcBtn = document.getElementById('calcBtn');
+    const suggestBtn = document.getElementById('suggestBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const outN = document.getElementById('outN');
+    const outVf = document.getElementById('outVf');
+    const calcMsgEl = document.getElementById('calcMsg');
+    const modeTitleEl = document.getElementById('modeTitle');
+    const modeSubEl = document.getElementById('modeSub');
+    const modeIconEl = document.getElementById('modeIcon');
+    const copyResBtn = document.getElementById('copyRes');
+    const exportCsvBtn = document.getElementById('exportCsv');
+    
+    // TAP模式元素
+    const standardInputs = document.getElementById('standardInputs');
+    const tapInputs = document.getElementById('tapInputs');
+    const standardResults = document.getElementById('standardResults');
+    const tapResults = document.getElementById('tapResults');
+    const threadTypeEl = document.getElementById('threadType');
+    const threadSizeEl = document.getElementById('threadSize');
+    const tapRpmEl = document.getElementById('tapRpm');
+    const tapMaterialEl = document.getElementById('tapMaterial');
+    const outTapVf = document.getElementById('outTapVf');
+    const outDrillSize = document.getElementById('outDrillSize');
+    const tapFormula = document.getElementById('tapFormula');
+
+    // 参考表格DOM
+    const refBody = document.getElementById('refBody');
+    const refToggleBtn = document.getElementById('refToggleBtn');
+
+    let currentMode = 'endmill';
+    let lastResult = null;
+
+    // 获取预设范围的辅助函数
+    function getPresetRange(mode, toolMat, workMat){
+      const wm = workMat;
+      // 如果找不到精确匹配，尝试使用carbide作为默认值
+      if(presets[wm] && presets[wm][toolMat]) {
+        return JSON.parse(JSON.stringify(presets[wm][toolMat]));
+      }
+      // 回退到carbide预设
+      if(presets[wm] && presets[wm]['carbide']) {
+        return JSON.parse(JSON.stringify(presets[wm]['carbide']));
+      }
+      // 最终回退值
+      return {vc:[60,120], fz:[0.02,0.05], tips: "无精确预设 — 使用保守值并进行测试。"};
+    }
+
+    // 更新建议的Vc/fz
+    function updateVcSuggestion(){
+      const tm = toolMatEl.value;
+      const wm = workMatEl.value;
+      const preset = getPresetRange(currentMode, tm, wm);
+      if(preset){
+        const vcRange = preset.vc || [60,120];
+        const fzRange = preset.fz || [0.02,0.05];
+        const minVc = Math.round(vcRange[0]); 
+        const maxVc = Math.round(vcRange[1]);
+        const mid = Math.round((minVc + maxVc)/2);
+        
+        // 获取当前刀具直径
+        const D = parseFloat(DEl.value) || 10; // 默认10mm
+        
+        // 计算建议的Vc，确保不超过最大转速
+        let suggestedVc = mid;
+        const calculatedRpm = (suggestedVc * 1000) / (PI * D);
+        
+        // 如果计算出的转速超过最大转速，调整Vc
+        if (calculatedRpm > MAX_RPM) {
+          suggestedVc = (MAX_RPM * PI * D) / 1000;
+          suggestedVc = Math.round(suggestedVc);
+        }
+        
+        // 只有在Vc输入框为空时才设置建议值
+        if(!VcEl.value.trim()) VcEl.value = suggestedVc;
+        
+        vcRangeEl.textContent = `Suggest VcRange: ${minVc} – ${maxVc} m/min`;
+        
+        if(fzRange){
+          if(currentMode === 'drill'){
+            fzRangeEl.textContent = `建议每转进给: ${Number(fzRange[0]).toFixed(3)} – ${Number(fzRange[1]).toFixed(3)} mm/rev`;
+          } else {
+            fzRangeEl.textContent = `Suggest fz Range: ${Number(fzRange[0]).toFixed(3)} – ${Number(fzRange[1]).toFixed(3)} mm/tooth`;
+          }
+        } else {
+          fzRangeEl.textContent = '';
+        }
+      } else {
+        vcRangeEl.textContent = 'NO RECOMMEND VC — Please Input Manualy Vc。';
+        fzRangeEl.textContent = ''; 
+      }
+    }
+
+    // 模式处理
+    function setMode(mode){
+      currentMode = mode;
+      modeButtons.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+      
+      if(mode === 'tap'){
+        // TAP模式
+        standardInputs.style.display = 'none';
+        tapInputs.classList.add('active');
+        standardResults.style.display = 'none';
+        tapResults.style.display = 'grid';
+        tapFormula.style.display = 'block';
+        modeTitleEl.textContent = 'Tap';
+        modeSubEl.textContent = 'Thread cutting parameters';
+        modeIconEl.innerHTML = '<i class="fa-solid fa-screwdriver"></i>';
+      } else if(mode === 'drill'){
+        // 钻孔模式
+        standardInputs.style.display = 'block';
+        tapInputs.classList.remove('active');
+        standardResults.style.display = 'grid';
+        tapResults.style.display = 'none';
+        tapFormula.style.display = 'none';
+        fzLabel.textContent = '每转进给 f (mm/rev)';
+        document.getElementById('zWrap').style.display = 'none';
+        modeTitleEl.textContent = 'Drill';
+        modeSubEl.textContent = '使用每转进给量 (f)';
+        modeIconEl.innerHTML = '<i class="fa-solid fa-drill"></i>';
+      } else if(mode === 'slot'){
+        // 槽铣刀模式
+        standardInputs.style.display = 'block';
+        tapInputs.classList.remove('active');
+        standardResults.style.display = 'grid';
+        tapResults.style.display = 'none';
+        tapFormula.style.display = 'none';
+        fzLabel.textContent = '每齿进给 fz (mm/tooth)';
+        document.getElementById('zWrap').style.display = '';
+        modeTitleEl.textContent = 'Slotmill';
+        modeSubEl.textContent = '用于开槽的保守切屑负载';
+        modeIconEl.innerHTML = '<i class="fa-solid fa-slash"></i>';
+      } else {
+        // 端铣刀模式
+        standardInputs.style.display = 'block';
+        tapInputs.classList.remove('active');
+        standardResults.style.display = 'grid';
+        tapResults.style.display = 'none';
+        tapFormula.style.display = 'none';
+        fzLabel.textContent = '每齿进给 fz (mm/tooth)';
+        document.getElementById('zWrap').style.display = '';
+        modeTitleEl.textContent = 'Endmill';
+        modeSubEl.textContent = 'fz × Z used for feed';
+        modeIconEl.innerHTML = '<i class="fa-solid fa-cut"></i>';
+      }
+      
+      if(mode !== 'tap') {
+        updateVcSuggestion();
+      }
+    }
+
+    // 解析螺纹规格
+    function parseThreadSpec(threadType, threadSpec) {
+      if (!threadSpec) return null;
+      
+      if (threadType === 'metric') {
+        // 解析公制螺纹，如 M6x1.0
+        const match = threadSpec.match(/M?(\d+(?:\.\d+)?)(?:[xX](\d+(?:\.\d+)?))?/);
+        if (match) {
+          const majorDiameter = parseFloat(match[1]);
+          const pitch = match[2] ? parseFloat(match[2]) : getDefaultMetricPitch(majorDiameter);
+          return { majorDiameter, pitch, type: 'metric' };
+        }
+      } else if (threadType === 'unc' || threadType === 'unf') {
+        // 解析UNC/UNF螺纹，如 5/16-18
+        const match = threadSpec.match(/(\d+)\/(\d+)[-xX]?(\d+)/);
+        if (match) {
+          const numerator = parseInt(match[1]);
+          const denominator = parseInt(match[2]);
+          const tpi = parseInt(match[3]);
+          const majorDiameter = numerator / denominator; // 英寸
+          const pitch = 1 / tpi; // 每英寸牙数的倒数
+          return { majorDiameter, pitch, tpi, type: threadType };
+        }
+      }
+      
+      return null;
+    }
+
+    // 获取默认公制螺纹螺距
+    function getDefaultMetricPitch(diameter) {
+      const defaultPitches = {
+        3: 0.5, 4: 0.7, 5: 0.8, 6: 1.0, 8: 1.25, 
+        10: 1.5, 12: 1.75, 14: 2.0, 16: 2.0, 
+        18: 2.5, 20: 2.5, 22: 2.5, 24: 3.0
+      };
+      return defaultPitches[Math.round(diameter)] || 1.0;
+    }
+
+    // 计算钻孔尺寸
+    function calculateDrillSize(threadData) {
+      if (!threadData) return null;
+      
+      if (threadData.type === 'metric') {
+        // 公制螺纹: 钻孔直径 = 螺纹直径 - 螺距
+        return threadData.majorDiameter - threadData.pitch;
+      } else if (threadData.type === 'unc' || threadData.type === 'unf') {
+        // UNC/UNF螺纹: 钻孔直径 = (螺纹直径 - 1/牙距) × 25.4 (转换为mm)
+        const drillSizeInches = threadData.majorDiameter - (1 / threadData.tpi);
+        return drillSizeInches * 25.4;
+      }
+      
+      return null;
+    }
+
+    // 计算函数 - 优化版
+    function calculate(){
+      const formulaUsedContainer = document.getElementById('formulaUsed');
+      if(formulaUsedContainer){
+        formulaUsedContainer.innerHTML = '';
+      }
+      calcMsgEl.textContent = '';
+      
+      if (currentMode === 'tap') {
+        // TAP模式计算
+        const threadType = threadTypeEl.value;
+        const threadSpec = threadSizeEl.value;
+        const rpm = parseFloatSafe(tapRpmEl.value);
+        
+        if (!threadSpec || isNaN(rpm)) {
+          calcMsgEl.textContent = 'Please enter thread specification and RPM';
+          calcMsgEl.className = 'warn';
+          return;
+        }
+        
+        const threadData = parseThreadSpec(threadType, threadSpec);
+        if (!threadData) {
+          calcMsgEl.textContent = 'Invalid thread specification format';
+          calcMsgEl.className = 'warn';
+          return;
+        }
+        
+        // 计算进给速度
+        let pitch;
+        if (threadData.type === 'metric') {
+          pitch = threadData.pitch;
+        } else {
+          // UNC/UNF: 螺距 = 25.4 / TPI
+          pitch = 25.4 / threadData.tpi;
+        }
+        
+        const feed = rpm * pitch;
+        outTapVf.textContent = `${feed.toFixed(1)} mm/min`;
+        
+        // 计算钻孔尺寸
+        const drillSize = calculateDrillSize(threadData);
+        if (drillSize) {
+          outDrillSize.textContent = `${drillSize.toFixed(2)} mm`;
+        } else {
+          outDrillSize.textContent = '-';
+        }
+        
+        calcMsgEl.textContent = 'Tapping calculation complete';
+        calcMsgEl.className = 'ok';
+        
+        lastResult = {
+          mode: 'tap',
+          threadType: threadType,
+          threadSpec: threadSpec,
+          rpm: rpm,
+          feed: feed,
+          drillSize: drillSize
+        };
+        
+        return;
+      }
+      
+      // 标准铣削计算
+      let Vc_input = parseFloatSafe(VcEl.value);
+      const D = parseFloatSafe(DEl.value);
+      let n = parseFloatSafe(nEl.value);
+      let Vf = parseFloatSafe(VfEl.value);
+      let fz = parseFloatSafe(fzEl.value);
+      let Z = parseFloatSafe(ZEl.value);
+      
+      let calculationSteps = [];
+      let warnings = [];
+
+      // 计算主轴转速
+      if(!isNaN(Vc_input) && !isNaN(D) && D > 0) {
+        n = (Vc_input * 1000) / (PI * D);
+        calculationSteps.push('n = (Vc × 1000) / (π × D)');
+      } else if(!isNaN(n) && !isNaN(D) && D > 0) {
+        Vc_input = (n * PI * D) / 1000;
+        calculationSteps.push('Vc = (n × π × D) / 1000');
+      }
+
+      // 限制最大转速
+      if(!isNaN(n) && n > MAX_RPM) {
+        n = MAX_RPM;
+        warnings.push(`转速已限制在最大安全转速 (${MAX_RPM} rpm)`);
+      }
+
+      // 计算进给速度
+      if(currentMode === 'drill'){
+        // 钻孔模式
+        if(!isNaN(n) && !isNaN(fz) && isNaN(Vf)) {
+          Vf = n * fz;
+          calculationSteps.push('Vf = n × f (f = mm/rev)');
+        } else if(!isNaN(Vf) && !isNaN(n) && isNaN(fz)) {
+          fz = Vf / n;
+          calculationSteps.push('f = Vf / n');
+        }
+      } else {
+        // 铣削模式
+        if(!isNaN(n) && !isNaN(fz) && !isNaN(Z) && isNaN(Vf)) {
+          Vf = n * fz * Z;
+          calculationSteps.push('Vf = n × fz × Z');
+        } else if(!isNaN(Vf) && !isNaN(n) && !isNaN(Z) && isNaN(fz)) {
+          fz = Vf / (n * Z);
+          calculationSteps.push('fz = Vf / (n × Z)');
+        } else if(!isNaN(Vf) && !isNaN(n) && !isNaN(fz) && isNaN(Z)) {
+          Z = Vf / (n * fz);
+          calculationSteps.push('Z = Vf / (n × fz)');
+        }
+      }
+
+      // 输出结果
+      const nOut = (!isNaN(n) && isFinite(n)) ? Math.round(n) : null;
+      const VfOut = (!isNaN(Vf) && isFinite(Vf)) ? Number(Vf.toFixed(1)) : null;
+      const fzOut = (!isNaN(fz) && isFinite(fz)) ? Number(fz.toFixed(4)) : null;
+
+      outN.textContent = nOut ? `${nOut} rpm` : '-';
+      outVf.textContent = VfOut ? `${VfOut} mm/min` : '-';
+
+      // 显示使用的公式
+      const dynamicContainer = document.getElementById('formulaUsed');
+      if(dynamicContainer && calculationSteps.length > 0){
+        dynamicContainer.innerHTML = '<strong>使用的公式:</strong>';
+        calculationSteps.forEach(s=>{
+          const d = document.createElement('div');
+          d.style.marginTop = '6px';
+          d.style.color = '#344146';
+          d.textContent = s;
+          dynamicContainer.appendChild(d);
+        });
+      }
+
+      // 警告检查
+      if(fzOut && fzOut > 0.5) warnings.push(`fz (${fzOut}) 看起来很大 — 检查单位`);
+      if(VfOut && VfOut > 10000) warnings.push(`Vf (${VfOut}) 异常大 — 检查输入`);
+      if(nOut && nOut > 8000) warnings.push(`转速 (${nOut}) 较高 — 确保机床能力允许`);
+      
+      if(warnings.length){
+        calcMsgEl.textContent = warnings.join(' • ');
+        calcMsgEl.className = 'warn';
+      } else if(nOut || VfOut) {
+        calcMsgEl.textContent = '计算完成 — 结果可作为起始建议。';
+        calcMsgEl.className = 'ok';
+      } else {
+        calcMsgEl.textContent = '等待输入...';
+        calcMsgEl.className = 'muted';
+      }
+
+      lastResult = {
+        mode: currentMode, 
+        Vc: Vc_input||null, 
+        D: DEl.value||null, 
+        n: nOut, 
+        Vf: VfOut, 
+        fz: fzOut, 
+        Z: Z||null
+      };
+    }
+
+    // 辅助函数
+    function parseFloatSafe(v){
+      if(v===undefined||v===null||v==='') return NaN;
+      const s = String(v).trim();
+      try {
+        // 允许简单表达式计算
+        if(/^[0-9+\-*/().\s]+$/.test(s)) {
+          return Function('"use strict";return (' + s + ')')();
+        }
+        // 普通数字解析
+        return parseFloat(s);
+      } catch(e){
+        return NaN;
+      }
+    }
+
+    function flash(el){
+      if(!el) return;
+      el.animate([
+        {boxShadow:'0 0 0 rgba(0,0,0,0)'},
+        {boxShadow:'0 10px 30px rgba(43,154,224,0.10)'},
+        {boxShadow:'0 0 0 rgba(0,0,0,0)'}
+      ], {duration:350});
+    }
+
+    // 事件监听器
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', () => setMode(btn.dataset.mode));
+    });
+    
+    toolMatEl.addEventListener('change', updateVcSuggestion);
+    workMatEl.addEventListener('change', updateVcSuggestion);
+    DEl.addEventListener('input', updateVcSuggestion); // 刀具直径变化时更新建议
+    calcBtn.addEventListener('click', calculate);
+    
+    // 为所有输入框添加回车键计算
+    [VcEl, DEl, nEl, VfEl, fzEl, ZEl, threadSizeEl, tapRpmEl].forEach(input => {
+      input.addEventListener('keydown', e => {
+        if(e.key === 'Enter') calculate();
+      });
+    });
+
+    // 建议按钮
+    suggestBtn.addEventListener('click', ()=>{
+      if (currentMode === 'tap') {
+        const material = tapMaterialEl.value;
+        const preset = tapPresets[material];
+        if (preset) {
+          const vcRange = preset.vc || [10, 20];
+          const midVc = Math.round((vcRange[0] + vcRange[1]) / 2);
+          tapRpmEl.value = midVc;
+          flash(tapRpmEl);
+        }
+        return;
+      }
+      
+      const tm = toolMatEl.value; 
+      const wm = workMatEl.value;
+      const preset = getPresetRange(currentMode, tm, wm);
+      if(!preset){ 
+        alert('此选择无可用预设。'); 
+        return; 
+      }
+      
+      const vcRange = preset.vc || [60,120];
+      const midVc = Math.round((vcRange[0] + vcRange[1]) / 2);
+      
+      // 获取当前刀具直径
+      const D = parseFloat(DEl.value) || 10; // 默认10mm
+      
+      // 计算建议的Vc，确保不超过最大转速
+      let suggestedVc = midVc;
+      const calculatedRpm = (suggestedVc * 1000) / (PI * D);
+      
+      // 如果计算出的转速超过最大转速，调整Vc
+      if (calculatedRpm > MAX_RPM) {
+        suggestedVc = (MAX_RPM * PI * D) / 1000;
+        suggestedVc = Math.round(suggestedVc);
+      }
+      
+      VcEl.value = suggestedVc;
+      
+      if(currentMode === 'drill'){
+        const f = preset.fz || [0.06,0.12];
+        fzEl.value = (f[0]).toFixed(3);
+      } else {
+        const fz = preset.fz || [0.02,0.04];
+        fzEl.value = (fz[0]).toFixed(3);
+        if(!ZEl.value) ZEl.value = 4;
+      }
+      
+      updateVcSuggestion();
+      flash(VcEl); 
+      flash(fzEl);
+    });
+
+    // 重置按钮
+    resetBtn.addEventListener('click', ()=>{
+      [VcEl, DEl, nEl, VfEl, fzEl, ZEl].forEach(i=> i.value = '');
+      [threadSizeEl, tapRpmEl].forEach(i=> i.value = '');
+      outN.textContent = '- rpm'; 
+      outVf.textContent = '- mm/min';
+      outTapVf.textContent = '- mm/min';
+      outDrillSize.textContent = '- mm';
+      calcMsgEl.textContent = 'Awaiting input...'; 
+      const dyna = document.getElementById('formulaUsed'); 
+      if(dyna) dyna.innerHTML='';
+      lastResult = null; 
+      
+      if (currentMode !== 'tap') {
+        updateVcSuggestion();
+      }
+    });
+
+    // 复制结果
+    copyResBtn.addEventListener('click', ()=>{
+      if(!lastResult){ alert('没有结果可复制'); return; }
+      navigator.clipboard?.writeText(JSON.stringify(lastResult, null, 2))
+        .then(()=> alert('结果已复制'))
+        .catch(()=> alert('复制失败'));
+    });
+
+    // 导出CSV
+    exportCsvBtn.addEventListener('click', ()=>{
+      if(!lastResult){ alert('没有结果可导出'); return; }
+      let rows, csv;
+      
+      if (lastResult.mode === 'tap') {
+        rows = [
+          ['mode','threadType','threadSpec','rpm','feed(mm/min)','drillSize(mm)'], 
+          [lastResult.mode, lastResult.threadType, lastResult.threadSpec, lastResult.rpm || '', lastResult.feed || '', lastResult.drillSize || '']
+        ];
+      } else {
+        rows = [
+          ['mode','Vc(m/min)','D(mm)','n(rpm)','Vf(mm/min)','fz(mm/tooth or mm/rev)','Z'], 
+          [lastResult.mode, lastResult.Vc || '', lastResult.D || '', lastResult.n || '', lastResult.Vf || '', lastResult.fz || '', lastResult.Z || '']
+        ];
+      }
+      
+      csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'}); 
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); 
+      a.href = url; 
+      a.download = 'milling_v4_5_result.csv'; 
+      a.click(); 
+      URL.revokeObjectURL(url);
+    });
+
+    // 参考表格切换
+    if(refToggleBtn){
+      refToggleBtn.addEventListener('click', ()=>{
+        const expanded = refToggleBtn.getAttribute('aria-expanded') === 'true';
+        if(expanded){
+          refBody.style.display = 'none';
+          refToggleBtn.setAttribute('aria-expanded','false');
+          refToggleBtn.textContent = 'Show reference';
+        } else {
+          refBody.style.display = 'block';
+          refToggleBtn.setAttribute('aria-expanded','true');
+          refToggleBtn.textContent = 'Hide reference';
+        }
+      });
+    }
+
+    // 初始化
+    (function init(){
+      setMode('endmill');
+      toolMatEl.value = 'carbide';
+      workMatEl.value = 'mild_steel';
+      updateVcSuggestion();
+
+      // 参考表格可见性行为
+      if(window.innerWidth > 980){
+        refBody.style.display = 'block';
+        if(refToggleBtn) { refToggleBtn.style.display = 'none'; }
+      } else {
+        refBody.style.display = 'none';
+        if(refToggleBtn) { 
+          refToggleBtn.textContent = 'Show reference'; 
+          refToggleBtn.setAttribute('aria-expanded','false'); 
+        }
+      }
+    })();
+
+    // 按 Enter 键触发计算
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('calcBtn').click();
+      }
+    });
+  </script>
+</body>
+</html>
