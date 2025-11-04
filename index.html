@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Tools</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS Tools</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -18,7 +18,18 @@
       <li><a href="pages/WIreCut.html" target="contentFrame" class="active">Wire EDM Calculator</a></li>
       <li><a href="pages/CSQR.html" target="contentFrame">QR & Barcode Generator</a></li>
       <li><a href="pages/MillingCalculator.html" target="contentFrame">Milling Calculator</a></li>
+
+      <!-- 🔹 Turning Calculator 主菜单 -->
+      <li class="submenu">
+        <a href="#" onclick="toggleSubmenu(event)">Turning Calculator ▸</a>
+        <ul class="submenu-items">
+          <li><a href="pages/Turning/Diagonal.html" target="contentFrame">Calculate Diagonal</a></li>
+          <li><a href="pages/Turning/AngleFormula.html" target="contentFrame">Formula for Finding Angle</a></li>
+          <li><a href="pages/Turning/DistanceFormula.html" target="contentFrame">Formula for Distance Calculation</a></li>
+        </ul>
+      </li>
     </ul>
+
     <footer>
       <p>© 2025 CircleSpin</p>
     </footer>
@@ -33,7 +44,7 @@
   <!-- 🔹 脚本 -->
   <script>
     // 菜单选中状态切换
-    const links = document.querySelectorAll('.sidebar a');
+    const links = document.querySelectorAll('.sidebar a[target="contentFrame"]');
     links.forEach(link => {
       link.addEventListener('click', () => {
         links.forEach(l => l.classList.remove('active'));
@@ -56,7 +67,21 @@
       const sidebar = document.querySelector('.sidebar');
       sidebar.classList.toggle('show');
     }
-  </script>
 
+    // 🔹 展开/收起子菜单
+    function toggleSubmenu(event) {
+      event.preventDefault();
+      const parent = event.target.closest('.submenu');
+      parent.classList.toggle('open');
+
+      // 改变箭头方向
+      const arrow = parent.querySelector('a');
+      if (parent.classList.contains('open')) {
+        arrow.innerHTML = "Turning Calculator ▾";
+      } else {
+        arrow.innerHTML = "Turning Calculator ▸";
+      }
+    }
+  </script>
 </body>
 </html>
