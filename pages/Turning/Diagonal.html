@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagonal Calculator — Industrial Standard</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f2f4f7;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+
+    header {
+      text-align: center;
+      background-color: #005bb5;
+      color: #fff;
+      padding: 18px 0;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+
+    .image-section {
+      text-align: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #e0e4ea;
+      padding-bottom: 20px;
+    }
+
+    .image-section img {
+      max-width: 350px;
+      height: auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    /* 左侧公式 */
+    .formula-panel {
+      flex: 1;
+      min-width: 260px;
+      background-color: #f7f9fb;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 5px solid #0078d7;
+    }
+
+    .formula-panel h2 {
+      color: #005bb5;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .formula {
+      font-family: Consolas, monospace;
+      background: #fff;
+      border: 1px solid #d9dfe6;
+      border-radius: 8px;
+      padding: 12px 15px;
+      line-height: 1.7;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* 右侧输入区域 */
+    .input-panel {
+      flex: 1;
+      min-width: 280px;
+      background-color: #f9fafc;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #d9dfe6;
+    }
+
+    .input-panel h2 {
+      color: #005bb5;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      font-size: 15px;
+      border-radius: 5px;
+      border: 1px solid #bbb;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #0078d7;
+      box-shadow: 0 0 5px rgba(0,120,215,0.3);
+    }
+
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px 0;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-calc {
+      background-color: #0078d7;
+      color: white;
+    }
+
+    .btn-calc:hover {
+      background-color: #005bb5;
+    }
+
+    .btn-reset {
+      background-color: #e3e6eb;
+      color: #333;
+    }
+
+    .btn-reset:hover {
+      background-color: #d0d4db;
+    }
+
+    .result {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: bold;
+      color: #005bb5;
+      min-height: 24px;
+    }
+
+    @media (max-width: 700px) {
+      .content {
+        flex-direction: column;
+      }
+    }
+
+        /* ✅ Mobile Friendly Layout */
+    @media (max-width: 700px) {
+      .container {
+        margin: 20px 10px;
+        padding: 18px;
+      }
+
+      header {
+        font-size: 20px;
+        padding: 14px 0;
+      }
+
+      .image-section img {
+        max-width: 95%;
+      }
+
+      .content {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .formula-panel,
+      .input-panel {
+        width: 100%;
+        min-width: auto;
+      }
+
+      .formula-panel {
+        border-left: none;
+        border-top: 4px solid #0078d7;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .result {
+        font-size: 16px;
+        word-wrap: break-word;
+      }
+    }
+    footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    @media (max-width: 600px) {
+      footer {
+        font-size: 0.8rem;
+        padding: 12px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>Diagonal Calculator</header>
+
+  <div class="container">
+    <!-- 图片 -->
+    <div class="image-section">
+      <img src="Png/Diagonal.png" alt="Rectangle Diagram">
+    </div>
+
+    <div class="content">
+      <!-- 左边公式区 -->
+      <div class="formula-panel">
+        <h2>Formulas</h2>
+        <div class="formula">
+          A = √(X² + Y²)<br>
+          X = √(A² − Y²)<br>
+          Y = √(A² − X²)
+        </div>
+      </div>
+
+      <!-- 右边输入区 -->
+      <div class="input-panel">
+        <h2>Input Values</h2>
+
+        <label for="aInput">A (Diagonal)</label>
+        <input type="number" id="aInput" placeholder="Enter A or leave blank">
+
+        <label for="xInput">X (Base)</label>
+        <input type="number" id="xInput" placeholder="Enter X or leave blank">
+
+        <label for="yInput">Y (Height)</label>
+        <input type="number" id="yInput" placeholder="Enter Y or leave blank">
+
+        <div class="buttons">
+          <button class="btn-calc" id="calcBtn">Calculate</button>
+          <button class="btn-reset" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="result" id="resultText">Enter any two values and click "Calculate".</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const aInput = document.getElementById('aInput');
+    const xInput = document.getElementById('xInput');
+    const yInput = document.getElementById('yInput');
+    const resultText = document.getElementById('resultText');
+    const calcBtn = document.getElementById('calcBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    calcBtn.addEventListener('click', () => {
+      const A = parseFloat(aInput.value);
+      const X = parseFloat(xInput.value);
+      const Y = parseFloat(yInput.value);
+      let result = "";
+
+      if (!isNaN(X) && !isNaN(Y) && isNaN(A)) {
+        const calcA = Math.sqrt(X * X + Y * Y);
+        result = `A = √(X² + Y²) = ${calcA.toFixed(4)}`;
+        aInput.value = calcA.toFixed(4);
+      } 
+      else if (!isNaN(A) && !isNaN(Y) && isNaN(X)) {
+        if (A > Y) {
+          const calcX = Math.sqrt(A * A - Y * Y);
+          result = `X = √(A² − Y²) = ${calcX.toFixed(4)}`;
+          xInput.value = calcX.toFixed(4);
+        } else {
+          result = "⚠️ Invalid: A must be greater than Y.";
+        }
+      } 
+      else if (!isNaN(A) && !isNaN(X) && isNaN(Y)) {
+        if (A > X) {
+          const calcY = Math.sqrt(A * A - X * X);
+          result = `Y = √(A² − X²) = ${calcY.toFixed(4)}`;
+          yInput.value = calcY.toFixed(4);
+        } else {
+          result = "⚠️ Invalid: A must be greater than X.";
+        }
+      } 
+      else {
+        result = "Please enter exactly two values.";
+      }
+
+      resultText.textContent = result;
+    });
+
+    resetBtn.addEventListener('click', () => {
+      aInput.value = "";
+      xInput.value = "";
+      yInput.value = "";
+      resultText.textContent = "Enter any two values and click \"Calculate\".";
+    });
+  </script>
+<footer>
+  <p>Diagonal Calculator — Circle Spin Precision Engineering</p>
+</footer>
+
+</body>
+</html>
